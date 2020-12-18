@@ -34,8 +34,7 @@ https://www.coursera.org/learn/intro-fpga-design-embedded-systems
 I've tested my work on an Xilinx FPGA board. You can find more about them here:
 https://www.xilinx.com/products/silicon-devices.html
 
-Implementation details
------------------------
+# Implementation details
 
 ## Level building
 
@@ -57,16 +56,16 @@ The rest of the boxes are defaulted to 00000, that it's the color of the sky. Th
 
 All this replacement will be performed by the FPGA board in realtime. Additionally, a code for moving mario around the screen was added. If we press the left or right on the board and Mario is located in the screen, he will move from right to left and left to right according to the button pressed.
 
-# Design
+## Design
 
 #### 
 
 #####
 #####
 
-### Implementation
+## Implementation
 
-#### Data preparation
+### Data preparation
 
 The implementation includes three memories: two for the sprites and one for the map. The values of those memories are providen by the files sprite1.bin, sprite2.bin and mapa.bin.
 
@@ -74,10 +73,10 @@ The sprite's memories occupy 2KB each one. Each memory address stores 8 bits and
 
 By the other side, the map memory stores 5 bits. Due the fact we have 5 maps of 300 boxes, the memory address is 11-bits long. 
 
-##### Sprites file encoding
-##### Maps file encoding
+#### Sprites file encoding
+#### Maps file encoding
 
-#### Code
+### Code
 
 
 
