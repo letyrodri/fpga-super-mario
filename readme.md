@@ -37,15 +37,49 @@ https://www.xilinx.com/products/silicon-devices.html
 Implementation details
 -----------------------
 
-### Level building
+## Level building
 
-As explained before, this project recreates Super Mario Bros. level in a FPGA board. It's designed in a 640x480 resolution. The level is composed using a level map and sprites that are assigned according to the mapping. To create the map, the 640x480 resolution was divided in 32x32 squares in the following way:
+As explained before, this project recreates Super Mario Bros. levels in a FPGA board. It's designed in a 640x480 resolution. The level is composed using a level map and sprites that are assigned according to the mapping. To create the map, the 640x480 resolution was divided in 32x32 squares in the following way:
 
 ![Screen division](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/screen.png)
 
-### Design
+Each of these 300 boxes can be filled with a different pattern selected from the sprite:
+
+![Sprite](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/sprites.jpeg)
+
+For example, a map may indicate the following: in the first position the binary value 00010, in the 230th position the binary value 11000 and, finally, in the 231th position the value 110001. A configuration like that will replace three boxes in the screen in the following way:
+
+![Replacement](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/replace.jpeg)
+
+The rest of the boxes are defaulted to 00000, that it's the color of the sky. The pixel value 11010111 (fucsia) in each sprite section is also replaced by light blue as the sky. Finally, the combination between the map provided in the example above and the sky replacement will result in this level:
+
+![Replacement](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/bluereplace.jpeg)
+
+All this replacement will be performed by the FPGA board in realtime. Additionally, a code for moving mario around the screen was added. If we press the left or right on the board and Mario is located in the screen, he will move from right to left and left to right according to the button pressed.
+
+# Design
+
+#### 
+
+#####
+#####
 
 ### Implementation
+
+#### Data preparation
+
+The implementation includes three memories: two for the sprites and one for the map. The values of those memories are providen by the files sprite1.bin, sprite2.bin and mapa.bin.
+
+The sprite's memories occupy 2KB each one. Each memory address stores 8 bits and it's addressed by 14-bits memory address.
+
+By the other side, the map memory stores 5 bits. Due the fact we have 5 maps of 300 boxes, the memory address is 11-bits long. 
+
+##### Sprites file encoding
+##### Maps file encoding
+
+#### Code
+
+
 
 
 ************
