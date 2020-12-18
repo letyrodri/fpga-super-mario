@@ -34,6 +34,22 @@ https://www.coursera.org/learn/intro-fpga-design-embedded-systems
 I've tested my work on an Xilinx FPGA board. You can find more about them here:
 https://www.xilinx.com/products/silicon-devices.html
 
+
+Project deployment
+-------------------
+This project was developed and deployed on the board using Xilinx's ISEC Simulator (ISim). This simulator let you test the program without having a board and implement the code on the FPGA board:
+https://www.xilinx.com/products/design-tools/isim.html
+
+The steps for development and deployment in ISE are:
+* Write the HDL (provided in src in this repository)
+* Syntasis verification and run the simulator
+* Sythesis and implementation:
+	* Translate: generate a netlist
+	* Map: Maps the FPGA
+	* Place and Route: decides the cells that is going to use our logic and how they will connect.
+* Generate and download the file to the FPGA board
+
+
 # Implementation details
 
 ## Level building
