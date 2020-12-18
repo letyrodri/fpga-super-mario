@@ -12,7 +12,7 @@ About this project
 ------------------
 On September 13th, 1985 the Super Mario Bros. platforms video game was launched for Family Computers Famicom and Nintendo Entertainment System (NES). This project implements, on an FPGA board, the levels of the legendary game.
 
-I've designed new levels using the Mario artwork. They use a 640x480 monitor resolution. A second goal is to do memory space saving as video games do. I'm not storing complete images. I use portions for it  and compose them according to a level configuration. The whole level image will be composed in real time from small images of 32x32 pixels called sprites.
+I've designed new levels using the Mario artwork. They use a 640x480 monitor resolution. A second goal is to do memory space saving as video games do. It is not storing complete images. It uses small portions for them and compose them according to a level configuration. The whole level image will be composed in real time from small images of 32x32 pixels called sprites.
 
 Repository organization
 -----------------------
@@ -34,9 +34,19 @@ https://www.coursera.org/learn/intro-fpga-design-embedded-systems
 I've tested my work on an Xilinx FPGA board. You can find more about them here:
 https://www.xilinx.com/products/silicon-devices.html
 
-Documentation
---------------
-This is the project documentation written in latex: 
+Implementation details
+-----------------------
+
+### Level building
+
+As explained before, this project recreates Super Mario Bros. level in a FPGA board. It's designed in a 640x480 resolution. The level is composed using a level map and sprites that are assigned according to the mapping. To create the map, the 640x480 resolution was divided in 32x32 squares in the following way:
+
+![Screen division](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/screen.png)
+
+### Design
+
+### Implementation
+
 
 ************
 My original project is hosted in Spanish in my work in progress github: https://github.com/letyrodridc/fpga-super-mario/wiki/Super-Mario-Bros-FPGA
