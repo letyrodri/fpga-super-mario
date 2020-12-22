@@ -66,7 +66,7 @@ For example, a map may indicate the following: in the first position the binary 
 
 ![Replacement](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/replace.jpeg)
 
-The rest of the boxes are defaulted to 00000, that it's the color of the sky. The pixel value 11010111 (fucsia) in each sprite section is also replaced by light blue as the sky. Finally, the combination between the map provided in the example above and the sky replacement will result in this level:
+The rest of the boxes are defaulted to 00000, that it's the color of the sky. The pixel value 11010111 (pink) in each sprite section is also replaced by light blue as the sky. Finally, the combination between the map provided in the example above and the sky replacement will result in this level:
 
 ![Replacement](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/bluereplace.jpeg)
 
@@ -74,10 +74,11 @@ All this replacement will be performed by the FPGA board in realtime. Additional
 
 ## Design
 
-#### 
+#### Top Level: Mario
 
-#####
-#####
+##### vga_sync module
+##### bitmap_gen module
+
 
 ## Implementation
 
@@ -89,17 +90,99 @@ The sprite's memories occupy 2KB each one. Each memory address stores 8 bits and
 
 By the other side, the map memory stores 5 bits. Due the fact we have 5 maps of 300 boxes, the memory address is 11-bits long. 
 
-#### Sprites file encoding
+#### Sprites encoding
+
+The Super Mario Bros images were grabbed from internet in 16 bit color. The software for Linux GIMP was used to compose the sprites. The steps were the following:
+
+* Select and cut the images in 32x32 pixels
+* Organize the sprites, one after another, in a single image until have 16 sprites per image.
+* Convert the image to 256 bits color encoding using Xilinx color palette
+* Save the image as raw
+* Process the image using a python script to translate it to a binary string so it can be read by spritex.v implementation
+
+The output files are sprite1.bin and sprite2.bin. The memory is accesible by the module sprite1.v and sprite2.v. 
+
+Here an image displaying sprite1.bin contents:
+![Sprite1 content](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/sprite_encoded.png)
+
+
 #### Maps file encoding
+
+For building the map, a CSV file was used. It has 20 columns and 75 lines (5 maps of 15 lines each) where eas position indicates a value between 0 and 31. Each value corresponds to the sprite index in the related position. Using a python script, that CSV was converted to a format that will be read by mapa.v file. 
+
+The Python script takes each map position, column by column, and covert the 5-bits binary number to a string. The output filename is mapa.bin.
+
+Here an image displaying mapa.bin contents:
+![Mapa content](https://raw.githubusercontent.com/letyrodri/fpga-super-mario/master/imgs/mapa_cat.png)
+
 
 ### Code
 
+The code includes a lot of mapping for replacing the sprite images according to the map specified. The map and the sprites are saved in memory. Here I'm showing  the calculations done for addressing the memory according to the current position (x, y) and the value in the map for that position.
 
+#### MAP\_ADDRESS\_LOGIC
+
+We can find the logic for calculating the memory address, according to x,y from the map, in the module MAP_ADDRESS_LOGIC.
+
+The calculation is the following:
+
+```
+assign addr_map_next = shift_map ∗ 15+((pix_x >>5)∗15)+( pix_y >>5);
+mapa mapa(.clk (clk), .en (1 ’b1), .addr( addr_map_next ), .dataout(sprite_block));
+```
+
+where pix\_x and pix\_y represent the screening current position (given by the module vga_sync.v) and shift\_map represent a register that contains the offset. This offset is calculated in base on the pressed right or left buttons.
+
+
+To search the index in the map, it divides by 32. It then multiplies by 15, so it can select the correct column. After that, it adds both values because the memory is contiguous. Finally, adds the ofset of the column.
+
+
+#### SPRITE\_ADDRESS\_LOGIC
+
+The memory address calculation for the sprite is in the bitmap\_gen.v module.
+
+As everything runs simustaneusly in a circuit, a calculated address is always in the output wire. The is a logic that uses the memory address when needed. The ouput value of sprite\_block is used to select the sprite.
+
+This is the formula used to calculate the sprite address:
+
+```
+assign addr_next = (pix_x % 32)+(( pix_y % 32)<<5)+( sprite_block −1)∗32∗32;
+sprite1 sprite1 ( .clk(clk) , .en( 1’b1 ) , .addr( addr_next ), .dataout( sprite1_out ));
+sprite2 sprite2 ( .clk(clk) , .en( 1’b1 ) , .addr( addr_next ), .dataout( sprite2_out ));
+```
+
+#### PIXEL\_LOGIC
+
+At last, there is a logic to solve the color and exceptional cases. In example, this code selects from sprite1 or sprite2. It replaces the pink with sky or when the value is 00000, it's also replaced by the sky.
+
+Here is the related code:
+```
+wire is_sprite2, is_sky;
+assign is_sprite2 = ( sprite_block > 16);
+assign is_sky = (sprite_block == 5’b00000) ||
+(is_sprite2 && (sprite2_out == TRANSPARENT_COLOR)) ||
+((!is_sprite2) && sprite1_out == TRANSPARENT_COLOR);
+
+always @∗
+	begin
+	bit_rgb = 8’b00000000;
+	if ( video_on )
+		begin
+			if ( is_sky )
+				// Block value 0 shows the light blue sky
+				bit_rgb = SKY_COLOR;
+			else
+				if ( is_sprite2 )
+					bit_rgb = sprite2_out ;
+				else
+					bit_rgb = sprite1_out ;
+		end
+	end
+```
 
 
 ************
-My original project is hosted in Spanish in my work in progress github: https://github.com/letyrodridc/fpga-super-mario/wiki/Super-Mario-Bros-FPGA
-:D
+My original project is hosted in Spanish on my work in progress github: https://github.com/letyrodridc/fpga-super-mario/wiki/Super-Mario-Bros-FPGA
 ************
 
 
